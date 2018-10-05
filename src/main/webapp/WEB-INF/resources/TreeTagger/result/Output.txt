@@ -1,0 +1,7 @@
+Ο	AtDfMaSgNm	ο
+δάσκαλος	NoCmMaSgNm	δάσκαλος
+εξήγησε	VbMnIdPa03SgPeAv	εξηγώ
+το	AtDfNeSgAc	ο
+μάθημα	NoCmNeSgAc	μάθημα
+στην	AsPpPaFeSgAc	στου
+τάξη	NoCmFeSgAc	τάξη

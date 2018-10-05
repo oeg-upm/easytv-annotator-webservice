@@ -13,17 +13,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 /**
  *
  * @author Pablo
  */
 @SpringBootApplication
-public class ProjectController {
+public class ProjectController extends SpringBootServletInitializer{ 
     
 
     public static void main(String[] args) {
         SpringApplication.run(ProjectController.class, args);
+    }
+    
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(ProjectController.class);
     }
 }

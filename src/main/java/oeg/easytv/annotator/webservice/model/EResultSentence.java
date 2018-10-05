@@ -25,7 +25,9 @@ public class EResultSentence {
     public String OriginalText;
     public String LematizedText;
     
-    
+     public EResultSentence(){
+        this.OriginalText="Failed";
+     }
     public EResultSentence(ESentence sentence){
     
         this.LematizedText=sentence.LematizedText;
