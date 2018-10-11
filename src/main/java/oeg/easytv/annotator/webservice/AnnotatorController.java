@@ -38,40 +38,11 @@ public class AnnotatorController {
      @Autowired
     ServletContext context;
 
-    EasyTVInterface annotator;
+    EasyTVInterface annotator=null;
     
     static Logger logger = Logger.getLogger(AnnotatorController.class);
     
 
-/*
-    @RequestMapping(
-            value = "/annotatesentence",
-            method = RequestMethod.POST)
-    @ResponseBody
-    public EResultSentence run(@RequestBody InputService video) throws Exception {
-
-        try {
-
-            if (annotator == null) {
-                annotator = new EasyTVInterface(context.getRealPath("/")+"/WEB-INF/"); //""
-                BabelNetInterface.serviceweb=true;
-                BabelNetInterface.ContextPath=context.getRealPath("/");
-            }
-
-            ESentence Es = annotator.processJson(mapInput(video));
-            EResultSentence res = new EResultSentence(Es);
-            return res;
-        } catch (Exception e) {
-
-            System.out.println("errror");
-            e.printStackTrace();
-
-        }
-
-        return new EResultSentence();
-
-    }
-  */  
     
     @RequestMapping(
             value = "/annotate",
@@ -85,6 +56,7 @@ public class AnnotatorController {
                 annotator = new EasyTVInterface(context.getRealPath("/")+"/WEB-INF/"); //context.getRealPath("/")+"/WEB-INF/"
                 BabelNetInterface.serviceweb=true;
                 BabelNetInterface.ContextPath=context.getRealPath("/");
+                BabelNetInterface.initInstance();
             }
 
             JsonInput videoJson = mapInput(video);
@@ -146,5 +118,34 @@ public class AnnotatorController {
     }
     
     
+/*
+    @RequestMapping(
+            value = "/annotatesentence",
+            method = RequestMethod.POST)
+    @ResponseBody
+    public EResultSentence run(@RequestBody InputService video) throws Exception {
+
+        try {
+
+            if (annotator == null) {
+                annotator = new EasyTVInterface(context.getRealPath("/")+"/WEB-INF/"); //""
+                BabelNetInterface.serviceweb=true;
+                BabelNetInterface.ContextPath=context.getRealPath("/");
+            }
+
+            ESentence Es = annotator.processJson(mapInput(video));
+            EResultSentence res = new EResultSentence(Es);
+            return res;
+        } catch (Exception e) {
+
+            System.out.println("errror");
+            e.printStackTrace();
+
+        }
+
+        return new EResultSentence();
+
+    }
+  */  
   
 }
