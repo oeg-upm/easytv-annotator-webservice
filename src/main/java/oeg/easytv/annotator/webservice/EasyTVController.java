@@ -40,7 +40,7 @@ public class EasyTVController {
     EasyTVInterface annotator;
     
 
-    
+    /*
     @RequestMapping(
             value = "/easyannotate",
             method = RequestMethod.POST)
@@ -55,7 +55,7 @@ public class EasyTVController {
                 BabelNetInterface.ContextPath=context.getRealPath("/");
             }
 
-            JsonInput video2= annotator.processJson2(mapInput(video));
+            JsonInput video2= annotator.processJson(mapInput(video));
             
             EResultVideo res = new EResultVideo(video2);
             
@@ -70,7 +70,7 @@ public class EasyTVController {
         return new EResultVideo();
 
     }
-    
+    */
     
     
     public JsonInput mapInput(InputService video){

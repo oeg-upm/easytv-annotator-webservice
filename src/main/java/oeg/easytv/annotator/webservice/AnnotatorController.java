@@ -23,6 +23,7 @@ import oeg.easytvannotator.model.EasyTVInterface;
 import oeg.easytvannotator.model.JsonInput;
 import oeg.easytvannotator.model.SignLanguageSegment;
 import oeg.easytvannotator.model.SignLanguageVideo;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,10 +37,13 @@ public class AnnotatorController {
 
      @Autowired
     ServletContext context;
-     
-     
+
     EasyTVInterface annotator;
     
+    static Logger logger = Logger.getLogger(AnnotatorController.class);
+    
+
+/*
     @RequestMapping(
             value = "/annotatesentence",
             method = RequestMethod.POST)
@@ -67,13 +71,13 @@ public class AnnotatorController {
         return new EResultSentence();
 
     }
-    
+  */  
     
     @RequestMapping(
             value = "/annotate",
             method = RequestMethod.POST)
     @ResponseBody
-    public EResultVideo run2(@RequestBody InputService video) throws Exception {
+    public EResultVideo annotateSentence(@RequestBody InputService video) throws Exception {
 
         try {
 
@@ -83,21 +87,20 @@ public class AnnotatorController {
                 BabelNetInterface.ContextPath=context.getRealPath("/");
             }
 
-            JsonInput video2= annotator.processJson2(mapInput(video));
+            JsonInput videoJson = mapInput(video);
+            ESentence ese= annotator.processJson(videoJson);
+            ese.associateVideos(videoJson);
             
-            EResultVideo res = new EResultVideo(video2);
+            EResultVideo res = new EResultVideo(videoJson);
             
             return res;
         } catch (Exception e) {
-
-            System.out.println("errror");
-            e.printStackTrace();
-
+            logger.error(e);
         }
 
         return new EResultVideo();
-
     }
+    
     
     @RequestMapping("/greeting")
     @ResponseBody
