@@ -53,6 +53,7 @@ public class AnnotatorController {
         try {
 
             if (annotator == null) {
+                logger.info("Init Annotator");
                 annotator = new EasyTVInterface(context.getRealPath("/")+"/WEB-INF/"); //context.getRealPath("/")+"/WEB-INF/"
                 BabelNetInterface.serviceweb=true;
                 BabelNetInterface.ContextPath=context.getRealPath("/");
@@ -67,7 +68,9 @@ public class AnnotatorController {
             
             return res;
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("Error in REST service",e);
+            logger.error(e.getCause().toString());
+            
         }
 
         return new EResultVideo();
