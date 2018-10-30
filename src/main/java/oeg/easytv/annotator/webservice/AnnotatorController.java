@@ -46,6 +46,8 @@ public class AnnotatorController {
     
     @RequestMapping(
             value = "/annotate",
+            consumes = "application/json;charset=UTF-8",
+            produces= "application/json;charset=UTF-8",
             method = RequestMethod.POST)
     @ResponseBody
     public EResultVideo annotateSentence(@RequestBody InputService video) throws Exception {
@@ -54,10 +56,10 @@ public class AnnotatorController {
 
             if (annotator == null) {
                 logger.info("Init Annotator");
-                annotator = new EasyTVInterface(context.getRealPath("/")+"/WEB-INF/"); //context.getRealPath("/")+"/WEB-INF/"
-                BabelNetInterface.serviceweb=true;
-                BabelNetInterface.ContextPath=context.getRealPath("/");
-                BabelNetInterface.initInstance();
+                annotator = new EasyTVInterface(context.getRealPath("/")+"/WEB-INF/",context.getRealPath("/"),true); 
+                //BabelNetInterface.serviceweb=true;
+                //BabelNetInterface.ContextPath=context.getRealPath("/");
+                //BabelNetInterface.initInstance();
             }
 
             JsonInput videoJson = mapInput(video);

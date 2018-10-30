@@ -11,6 +11,7 @@ import it.uniroma1.lcl.kb.ExternalResource;
 import java.util.ArrayList;
 import java.util.List;
 import oeg.easytvannotator.babelnet.BabelLangInterface;
+import oeg.easytvannotator.babelnet.BabelNetSynset;
 import oeg.easytvannotator.model.EToken;
 import oeg.easytvannotator.model.SignLanguageSegment;
 
@@ -47,12 +48,12 @@ public class EResultSegment {
         int counter=0;
         
         
-        for (BabelSynset syn : seg.LemmaSynsets) {
-            BabelSense sense = syn.getMainSense(BabelLangInterface.getLangType(Language)).get();
+        for (BabelNetSynset syn : seg.LemmaSynsets) {
+            BabelSense sense = syn.MainSense;
 
             if (counter==3){break;}
             //  "http://babelnet.org/rdf/maestro_ES/s00046958n"
-            String id = syn.getID().toString().replace("bn:", "");
+            String id = syn.ID.replace("bn:", "");
 
             String url = "http://babelnet.org/rdf/s" + id;
             String sens = "http://babelnet.org/rdf/" + parseLemma(sense.getFullLemma()) + "_" + sense.getLanguage().toString() + "/s" + id;
