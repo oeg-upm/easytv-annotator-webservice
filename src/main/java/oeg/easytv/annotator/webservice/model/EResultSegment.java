@@ -14,26 +14,29 @@ import oeg.easytvannotator.babelnet.BabelLangInterface;
 import oeg.easytvannotator.babelnet.BabelNetSynset;
 import oeg.easytvannotator.model.EToken;
 import oeg.easytvannotator.model.SignLanguageSegment;
+import oeg.easytvannotator.model.SignLanguageVideo;
 
 /**
  *
  * @author Pablo
  */
 public class EResultSegment {
+    
     public String Word;
     public String POS;
     public String Lemma;
     //public String Stemm;
     public String Language;
-    
     public String Order;
     public String Start;
     public String End;
     
-    public List<ESynset> Synsets;
-    
-    
-    public EResultSegment(SignLanguageSegment seg){
+    public List<ESynset> Synsets;    
+    public String Url;
+    public String Nls;
+    public String Sls;
+
+    public EResultSegment(SignLanguageSegment seg, SignLanguageVideo video){
     
         this.Word=seg.Word;
         this.POS=seg.POS;
@@ -47,6 +50,9 @@ public class EResultSegment {
         
         int counter=0;
         
+        this.Url= video.getUrl();
+        this.Nls=video.getNls();
+        this.Sls=video.getSls();
         
         for (BabelNetSynset syn : seg.LemmaSynsets) {
             BabelSense sense = syn.MainSense;
@@ -65,6 +71,7 @@ public class EResultSegment {
 
 
     }
+
     
      public String parseLemma(String lemma){
 

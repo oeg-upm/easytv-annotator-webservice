@@ -69,6 +69,7 @@ public class AnnotatorController {
             EResultVideo res = new EResultVideo(videoJson);
             
             return res;
+            
         } catch (Exception e) {
             logger.error("Error in REST service",e);
             logger.error(e.getCause().toString());

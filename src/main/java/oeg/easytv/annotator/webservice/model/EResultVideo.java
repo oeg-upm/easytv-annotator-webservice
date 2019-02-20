@@ -20,22 +20,25 @@ public class EResultVideo {
     
     public List<EResultSegment> segments;
     
-    public String OriginalText;
-    //public String LematizedText;
+    public String Nls;
+    public String Sls;
+    public String Url;
     
      public EResultVideo(){
-        this.OriginalText="Failed";
+        this.Nls="Failed";
      }
     public EResultVideo(JsonInput video){
     
-       // this.LematizedText=video.getVideo().LematizedText;
-        this.OriginalText=video.getVideo().getNls();//.OriginalText;
+        this.Nls=video.getVideo().getNls();
+        this.Sls=video.getVideo().getSls();
+        this.Url=video.getVideo().getUrl();
+        
         
         segments=new ArrayList();
         
         for (SignLanguageSegment seg : video.getVideo().getSegments()) {
 
-           segments.add(new EResultSegment(seg));
+           segments.add(new EResultSegment(seg,video.getVideo()));
            
         }
 
