@@ -6,15 +6,11 @@
 package oeg.easytv.annotator.webservice.model;
 
 import it.uniroma1.lcl.babelnet.BabelSense;
-import it.uniroma1.lcl.babelnet.BabelSynset;
-import it.uniroma1.lcl.kb.ExternalResource;
+
 import java.util.ArrayList;
 import java.util.List;
-import oeg.easytvannotator.babelnet.BabelLangInterface;
 import oeg.easytvannotator.babelnet.BabelNetSynset;
-import oeg.easytvannotator.model.EToken;
 import oeg.easytvannotator.model.SignLanguageSegment;
-import oeg.easytvannotator.model.SignLanguageVideo;
 
 /**
  *
@@ -25,9 +21,9 @@ public class EResultSegment {
     public String Word;
     public String POS;
     public String Lemma;
-    //public String Stemm;
     public String Language;
     public String Order;
+    public String NextOrder;
     public String Start;
     public String End;
     
@@ -36,25 +32,24 @@ public class EResultSegment {
     public String Nls;
     public String Sls;
 
-    public EResultSegment(SignLanguageSegment seg, SignLanguageVideo video){
+    public EResultSegment(SignLanguageSegment seg, String NextOrder, String Url, String Nls, String Sls){
     
         this.Word=seg.Word;
         this.POS=seg.POS;
         this.Lemma=seg.Lemma;
         this.Language=seg.Language;
-        Synsets=new ArrayList();
-        
         this.Order=seg.getOrder();
         this.Start=seg.getStart();
         this.End=seg.getEnd();
-        
+        this.Synsets=new ArrayList();
+        this.NextOrder=NextOrder;
         int counter=0;
         
-        this.Url= video.getUrl();
-        this.Nls=video.getNls();
-        this.Sls=video.getSls();
+        this.Url= Url;
+        this.Nls=Nls;
+        this.Sls=Sls;
         
-        for (BabelNetSynset syn : seg.LemmaSynsets) {
+        for (BabelNetSynset syn : seg.Synsets) {
             BabelSense sense = syn.MainSense;
 
             if (counter==3){break;}
@@ -74,9 +69,7 @@ public class EResultSegment {
 
     
      public String parseLemma(String lemma){
-
         return lemma.replaceAll("Ã¡", "á").replaceAll("Ã©", "é").replaceAll("Ã­", "í").replaceAll("Ã³", "ó").replaceAll("Ãº", "ú");
-
     }
     
 }

@@ -1,7 +1,7 @@
-Ο	AtDfMaSgNm	ο
-δάσκαλος	NoCmMaSgNm	δάσκαλος
-εξήγησε	VbMnIdPa03SgPeAv	εξηγώ
-το	AtDfNeSgAc	ο
-μάθημα	NoCmNeSgAc	μάθημα
-στην	AsPpPaFeSgAc	στου
-τάξη	NoCmFeSgAc	τάξη
+Σε	AsPpSp	σε
+αυτή	PnDmFe03SgAc	αυτός
+τη	AtDfFeSgAc	ο
+σπηλιά	NoCmFeSgAc	σπηλιά
+ζει	VbMnIdPr03SgIpAv	ζώ
+μια	AtIdFeSgAc	ένας
+αρκούδα	NoCmFeSgAc	αρκούδα

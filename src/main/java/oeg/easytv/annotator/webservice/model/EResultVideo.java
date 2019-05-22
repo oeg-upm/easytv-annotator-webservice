@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import oeg.easytvannotator.model.ESentence;
 import oeg.easytvannotator.model.EToken;
-import oeg.easytvannotator.model.JsonInput;
+import oeg.easytvannotator.model.input.JsonSignLanguageAnnotationInput;
 import oeg.easytvannotator.model.SignLanguageSegment;
 
 /**
@@ -27,7 +27,7 @@ public class EResultVideo {
      public EResultVideo(){
         this.Nls="Failed";
      }
-    public EResultVideo(JsonInput video){
+    public EResultVideo(JsonSignLanguageAnnotationInput video){
     
         this.Nls=video.getVideo().getNls();
         this.Sls=video.getVideo().getSls();
@@ -38,7 +38,7 @@ public class EResultVideo {
         
         for (SignLanguageSegment seg : video.getVideo().getSegments()) {
 
-           segments.add(new EResultSegment(seg,video.getVideo()));
+           segments.add(new EResultSegment(seg,"1" ,Url,Nls,Sls));
            
         }
 

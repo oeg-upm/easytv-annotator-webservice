@@ -50,6 +50,13 @@
             <artifactId>easytv-annotator</artifactId>
             <version>1.0</version>
         </dependency>
+     
+        <dependency>
+            <groupId>org.upm.oeg</groupId>
+            <artifactId>easytv-rdfy</artifactId>
+            <version>1.0</version>
+        </dependency>
+        
     </dependencies>
 
 

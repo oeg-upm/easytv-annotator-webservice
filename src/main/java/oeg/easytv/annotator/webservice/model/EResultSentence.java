@@ -5,12 +5,9 @@
  */
 package oeg.easytv.annotator.webservice.model;
 
-import it.uniroma1.lcl.babelnet.BabelSense;
-import it.uniroma1.lcl.babelnet.BabelSynset;
-import it.uniroma1.lcl.kb.ExternalResource;
+
 import java.util.ArrayList;
 import java.util.List;
-import oeg.easytvannotator.babelnet.BabelLangInterface;
 import oeg.easytvannotator.model.ESentence;
 import oeg.easytvannotator.model.EToken;
 

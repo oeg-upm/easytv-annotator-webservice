@@ -12,13 +12,13 @@ package oeg.easytv.annotator.webservice.model;
 public class ESynset {
     
     
-    public String url;
-    public String sense;
+    public String Url;
+    public String Sense;
     
     public ESynset(String u, String sens){
     
-        url=u;
-        sense=sens;
+        Url=u;
+        Sense=sens;
     }
     
 }

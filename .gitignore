@@ -24,3 +24,9 @@ hs_err_pid*
 
 target/
 /target/*
+
+# The par file is compressed in greek.par.zip or greek.par.tar.xz
+src/main/webapp/WEB-INF/resources/TreeTagger/lib/greek.par
+
+# Connection to the server
+src/main/webapp/WEB-INF/util/options.properties

@@ -1,0 +1,60 @@
+{  "Sls": "televisión en color",
+   "Nls": "televisión en color",
+   "Url": "https://media.spreadthesign.com/video/mp4/5/157259.mp4",
+   "Lang": "es" ,
+   "Segments": [
+      {
+         "Word": "televisión",
+         "POS": "NCFS000",
+         "Lemma": "televisión",
+         "Language": "es",
+         "Order": "1",
+         "NextOrder": "2",
+         "Start": "00:00",
+         "End": "00:02",
+         "Synsets": [
+            {
+               "Url": "http://babelnet.org/rdf/s00012048n",
+               "Sense": "http://babelnet.org/rdf/televisión_ES/s00012048n"
+            },
+            {
+               "Url": "http://babelnet.org/rdf/s00076373n",
+               "Sense": "http://babelnet.org/rdf/televisión_ES/s00076373n"
+            },
+            {
+               "Url": "http://babelnet.org/rdf/s00076421n",
+               "Sense": "http://babelnet.org/rdf/sistema_de_televisión_ES/s00076421n"
+            }
+         ],
+         "Url": "https://media.spreadthesign.com/video/mp4/5/157259.mp4",
+         "Nls": "televisión en color",
+         "Sls": "televisión en color"
+      },
+      {
+         "Word": "color",
+         "POS": "NCMS000",
+         "Lemma": "color",
+         "Language": "es",
+         "Order": "2",
+         "Start": "00:035",
+         "End": "00:04",
+         "Synsets": [
+            {
+               "Url": "http://babelnet.org/rdf/s00029280n",
+               "Sense": "http://babelnet.org/rdf/color_ES/s00029280n"
+            },
+            {
+               "Url": "http://babelnet.org/rdf/s00020728n",
+               "Sense": "http://babelnet.org/rdf/color_ES/s00020728n"
+            },
+            {
+               "Url": "http://babelnet.org/rdf/s00020777n",
+               "Sense": "http://babelnet.org/rdf/color_ES/s00020777n"
+            }
+         ],
+         "Url": "https://media.spreadthesign.com/video/mp4/5/157259.mp4",
+         "Nls": "televisión en color",
+         "Sls": "televisión en color"
+      }
+   ]
+}
