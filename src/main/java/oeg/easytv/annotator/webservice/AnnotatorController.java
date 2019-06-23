@@ -11,71 +11,252 @@ package oeg.easytv.annotator.webservice;
  */
 
 
-
-
 import java.util.ArrayList;
 import javax.servlet.ServletContext;
-import oeg.easytv.annotator.webservice.model.EResultVideo;
-import oeg.easytv.annotator.webservice.model.EResultVideoAnnotation;
-import oeg.easytv.annotator.webservice.model.InputSegment;
-import oeg.easytv.annotator.webservice.model.InputService;
-import oeg.easytv.annotator.webservice.model.InputServiceTranslation;
+import oeg.easytv.annotator.webservice.comm.output.EResultVideoAnnotation;
+import oeg.easytv.annotator.webservice.comm.input.InputAnnotateVideo;
 import oeg.easytvannotator.annotation.SignLanguageVideoAnnotator;
 import oeg.easytvannotator.babelnet.BabelNetInterface;
 import oeg.easytvannotator.model.ESentence;
 import oeg.easytvannotator.model.EasyTVInterface;
-import oeg.easytvannotator.model.input.JsonSignLanguageAnnotationInput;
-import oeg.easytvannotator.model.SignLanguageSegment;
-import oeg.easytvannotator.model.SignLanguageVideo;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.upm.oeg.easytv.rdfy.Mapper;
 import com.babelscape.util.UniversalPOS;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import it.uniroma1.lcl.jlt.util.Language;
-
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.sql.Timestamp;
+import java.util.Properties;
+import oeg.easytv.annotator.webservice.comm.input.InputAnnotateTranslatedVideos;
+import oeg.easytv.annotator.webservice.model.TranslatedVideos;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.upm.oeg.easytv.rdfy.Querier;
 
 
 @Controller
 public class AnnotatorController {
 
-     @Autowired
-    ServletContext context;
+    //@Autowired
+    private ServletContext context2;
+    
+    
+    //private String context="C:\\Users\\Pablo\\Desktop\\easyResources"; 
+    
+    private SignLanguageVideoAnnotator Annotator=null;
 
-    EasyTVInterface annotator=null;
+    private static Logger logger = Logger.getLogger(AnnotatorController.class);
     
-    SignLanguageVideoAnnotator Annotator=null;
     
-    static Logger logger = Logger.getLogger(AnnotatorController.class);
-    
+    private String BabelNetDir;
+    private String NLPDir;
+    private String RdfyDir;
 
     public void initAnnotator(){
     
-         this.Annotator = new SignLanguageVideoAnnotator(context.getRealPath("/")+"/WEB-INF/",context.getRealPath("/"),true); 
+         //this.Annotator = new SignLanguageVideoAnnotator(context.getRealPath("/")+"/WEB-INF/",context.getRealPath("/"),true); 
+         
+        this.initProperties();
+         
+        this.Annotator = new SignLanguageVideoAnnotator(NLPDir,BabelNetDir,true); 
     
     }
     
     
+    public void initProperties(){
+    
+        
+          try {
+
+            
+            InputStream input = this.getClass().getClassLoader().getResourceAsStream("configuration.properties");
+            System.out.println(input.toString());
+            
+            Properties properties = new Properties();
+            properties.load(input);
+
+            
+            BabelNetDir = properties.getProperty("babelnetSources");
+            NLPDir = properties.getProperty("nlpSources");
+            RdfyDir = properties.getProperty("rdfySources");
+
+        } catch (Exception e) {
+            System.out.println("Error finding properties file. Execution aborted. ");
+            e.printStackTrace();
+        }
+       
+    }
+    
+    /*
+    
+    S1 Annotate video
+    Presented in T3.2
+    Main service used to populate the ontology
+
+    S2 Annotate 2 translated videos
+    The same process as S1 + generate a link between the videos
+
+
+        S3 Get translation (2 ways)
+    1. The video is already annotated in the system
+    JSON input pointing to a video in the system
+    2. The video is NOT annotated in the system
+    Part of S1 (annotation) is executed
+    JSON input from T3.1
+
+    S4 Verify 2 translated videos
+    2 already annotated videos are verified
+
+
+    
+    */
   
+    
+    
+    
     
     @RequestMapping(
             value = "/annotateVideo",
             consumes = "application/json;charset=UTF-8",
+            //produces= "application/json;charset=UTF-8",
+            //produces= "text/plain;charset=UTF-8",
+            method = RequestMethod.POST)
+    @ResponseBody
+    public String annotateVideo(@RequestBody InputAnnotateVideo InputJson) {
+
+        try {
+
+            if (Annotator == null) {
+                logger.info("Init Annotator");
+                this.initAnnotator();
+            }
+
+            Gson gson = new Gson(); 
+            
+            //LOG : recived
+            createLogFile(InputJson.getVideo().getNls()+".json", this.RdfyDir+"logs/jsonvideo" , gson.toJson(InputJson));
+        
+            
+            
+            
+            Annotator.annotateSignLanguageVideo(InputJson.getVideo());
+            EResultVideoAnnotation res = new EResultVideoAnnotation(InputJson.getVideo());
+            
+            
+            
+            
+
+            
+            /// MAP TO ONTOLOGY
+            Mapper map=new Mapper(this.RdfyDir);
+            map.createJsonFile(InputJson.getVideo().getNls(),  gson.toJson(res));
+            map.generateMappings(InputJson.getVideo().getNls());
+            
+            
+            return "Done";
+            
+        } catch (Exception e) {
+            logger.error("Error in REST service",e);
+            logger.error(e.getCause().toString());
+            e.printStackTrace();
+            
+            return "Failed";
+        }
+
+       
+    }
+    
+    
+    
+    
+    
+    
+    @RequestMapping(
+            value = "/annotateTranslatedVideos",
+            consumes = "application/json;charset=UTF-8",
+            //produces= "application/json;charset=UTF-8",
+            //produces= "text/plain;charset=UTF-8",
+            method = RequestMethod.POST)
+    @ResponseBody
+    public String annotateTranslatedVideos(@RequestBody InputAnnotateTranslatedVideos InputJson) {
+
+        try {
+
+            if (Annotator == null) {
+                logger.info("Init Annotator");
+                this.initAnnotator();
+            }
+
+            Gson gson = new Gson(); 
+            
+            //LOG : recived
+            createLogFile(InputJson.getVideo1().getNls()+".json", this.RdfyDir+"logs/jsonvideo" , gson.toJson(InputJson));
+        
+            
+            
+            // video1
+            Annotator.annotateSignLanguageVideo(InputJson.getVideo1());
+            EResultVideoAnnotation res1 = new EResultVideoAnnotation(InputJson.getVideo1());
+            
+            // video2
+            Annotator.annotateSignLanguageVideo(InputJson.getVideo2());
+            EResultVideoAnnotation res2 = new EResultVideoAnnotation(InputJson.getVideo2());
+            
+
+            
+            /// MAP TO ONTOLOGY
+            Mapper map=new Mapper(this.RdfyDir);
+            map.createJsonFile(InputJson.getVideo1().getNls(),  gson.toJson(res1));
+            map.generateMappings(InputJson.getVideo1().getNls());
+            
+            
+            map.createJsonFile(InputJson.getVideo2().getNls(),  gson.toJson(res2));
+            map.generateMappings(InputJson.getVideo2().getNls());
+            
+            
+            // CREATE MAPPING QUERY
+            //map.queryTranslation(NLPDir, NLPDir, NLPDir, NLPDir, NLPDir, NLPDir);
+            
+                    
+            return "Done";
+            
+        } catch (Exception e) {
+            logger.error("Error in REST service",e);
+            logger.error(e.getCause().toString());
+            e.printStackTrace();
+            
+            return "Failed";
+        }
+
+       
+    }
+    
+    
+    
+    
+    
+    
+    @RequestMapping(
+            value = "/annotateTranslatedVideo",
+            consumes = "application/json;charset=UTF-8",
             produces= "application/json;charset=UTF-8",
             method = RequestMethod.POST)
     @ResponseBody
-    public EResultVideoAnnotation annotateVideo(@RequestBody InputService video) throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(Include.NON_NULL);
+    public String annotateTranslatedVideo(@RequestBody TranslatedVideos videos) throws Exception {
+ 
+        //LOG
+        createLogFile(videos.getVideos().get(0).getNls()+".json", this.RdfyDir+"logs/jsonvideo" , videos.toString());
+        
         try {
 
             if (Annotator == null) {
@@ -83,36 +264,67 @@ public class AnnotatorController {
                 this.initAnnotator();
                
             }
-
-            JsonSignLanguageAnnotationInput videoJson = mapInput(video);
-            Annotator.annotateSignLanguageVideo(videoJson);
-            EResultVideoAnnotation res = new EResultVideoAnnotation(videoJson);
+            System.out.println(videos.getVideos().get(0).getNls());
+           
             
-            
-            Gson gson = new Gson();
-            String json = gson.toJson(res);
-
-            System.out.println(json);
-
-            
-            Mapper.createFile(context.getRealPath("/")+"/WEB-INF/source/json/test.json", json);
-            Mapper map=new Mapper(context.getRealPath("/")+"/WEB-INF/");
-            map.generateMappings();
-            
-            
-            return res;
+            return "uploaded";
             
         } catch (Exception e) {
             logger.error("Error in REST service",e);
             logger.error(e.getCause().toString());
             e.printStackTrace();
-            
-            
-            return new EResultVideoAnnotation();
+            return "failed";
         }
 
        
     }
+    
+    
+    
+    @RequestMapping(
+            value = "/getAllVideos",   
+            method = RequestMethod.GET)
+    @ResponseBody
+    public String getAllFromSparql() throws Exception {
+ 
+          System.out.println("enttroororrororo");
+            Querier querier=new Querier(this.RdfyDir); //.getRealPath("/")
+          System.out.println("consulto");
+        
+        return querier.sendQueryAll();
+       
+    }
+    
+    
+    @RequestMapping(
+            value = "/getTranslation",
+            method = RequestMethod.GET)
+    @ResponseBody
+    public String getTranslation(@RequestParam String videoId) throws Exception {
+        //@RequestMapping(value = "/personId")              
+        //String getId(@RequestParam String personId
+       //localhost:8090/home/personId?personId=5
+       
+       
+       
+        return videoId;
+       
+    }
+    
+    
+    @RequestMapping(
+            value = "/verifyTranslations",
+            consumes = "application/json;charset=UTF-8",
+            produces= "application/json;charset=UTF-8",
+            method = RequestMethod.POST)
+    @ResponseBody
+    public String verifyTranslations(@RequestBody TranslatedVideos videos) throws Exception {
+ 
+       
+        return "UNDER DEVELOPMENT";
+       
+    }
+    
     
     
     @RequestMapping(
@@ -123,13 +335,13 @@ public class AnnotatorController {
     @ResponseBody
     public String uploadGraph(@RequestBody String json) throws Exception {
 
+        initProperties();
         try{
             System.out.println(json);
-
             
-            Mapper.createFile(context.getRealPath("/")+"/WEB-INF/source/json/test.json", json);
-            Mapper map=new Mapper(context.getRealPath("/")+"/WEB-INF/");
-            map.generateMappings();
+            Mapper map=new Mapper(RdfyDir);
+            map.createJsonFile("manual",json);
+            map.generateMappings("manualgraph");
             
             
             return "Done";
@@ -161,10 +373,11 @@ public class AnnotatorController {
     @RequestMapping("/testGreek")
     @ResponseBody
     public String testGreek() {
-        
+        initProperties();
+        EasyTVInterface annotator=null;
        if (annotator == null) {
                 logger.info("Init Annotator");
-                annotator = new EasyTVInterface(context.getRealPath("/")+"/WEB-INF/",context.getRealPath("/"),true); 
+                annotator = new EasyTVInterface(this.NLPDir,this.BabelNetDir,true); 
                
           }
        ESentence ese= annotator.procesSentence("EL","το σπίτι είναι κόκκινο");
@@ -176,8 +389,8 @@ public class AnnotatorController {
     @RequestMapping("/testBabelNetConnection")
     @ResponseBody
     public String testSpanish() {
-        
-        BabelNetInterface bn= new BabelNetInterface(context.getRealPath("/"),true); 
+        initProperties();
+        BabelNetInterface bn= new BabelNetInterface(this.BabelNetDir,true); 
         bn.initInstance();
         return bn.callBabelNetWordPOS("casa", Language.ES, UniversalPOS.NOUN).get(0).ID;
 
@@ -195,69 +408,40 @@ public class AnnotatorController {
     
    
     
+  
     
     
-    public JsonSignLanguageAnnotationInput mapInput(InputService video){
     
-        JsonSignLanguageAnnotationInput input= new JsonSignLanguageAnnotationInput();
-        input.setVideo(new SignLanguageVideo());
-        
-        input.getVideo().setDuration(video.getVideo().getDuration());
-        input.getVideo().setLanguage(video.getVideo().getLanguage());
-        input.getVideo().setNls(video.getVideo().getNls());
-        input.getVideo().setSls(video.getVideo().getSls());
-        input.getVideo().setUrl(video.getVideo().getUrl());
-        
-        input.getVideo().setSegments(new ArrayList());
-        
-        for(InputSegment seg : video.getVideo().getSegments()){
-        
-            SignLanguageSegment slsegment=new SignLanguageSegment();
-            slsegment.setContent(seg.getContent());
-            slsegment.setStart(seg.getStart());
-            slsegment.setEnd(seg.getEnd());
-            slsegment.setOrder(seg.getOrder());
-            slsegment.setWord(seg.getContent());
-            slsegment.setLanguage(video.getVideo().getLanguage());
-            input.getVideo().getSegments().add(slsegment);
-        
+     public static File createLogFile(String FileName, String Dir, String Text) {
+
+
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String time = timestamp.toString().replaceAll(":", "\\.");
+         
+         
+        File file = null;
+        try {
+
+            file = new File(Dir + File.separator + time+"-"+FileName);
+
+            Writer out = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(file), "UTF8"));
+
+            out.append(Text);
+
+            out.flush();
+            out.close();
+
+        } catch (IOException e) {
+            logger.error(e);
+
         }
-        
-        return input;
-    
+
+        return file;
+
     }
     
-    
-    /*
-    public JsonSignLanguageAnnotationInput mapInput2(InputServiceTranslation video){
-    
-        JsonSignLanguageAnnotationInput input= new JsonSignLanguageAnnotationInput();
-        input.setVideo(new SignLanguageVideo());
-        
-        input.getVideo().setDuration(video.getVideo().getDuration());
-        input.getVideo().setLanguage(video.getVideo().getLanguage());
-        input.getVideo().setNls(video.getVideo().getNls());
-        input.getVideo().setSls(video.getVideo().getSls());
-        input.getVideo().setUrl(video.getVideo().getUrl());
-        
-        input.getVideo().setSegments(new ArrayList());
-        
-        for(InputSegment seg : video.getVideo().getSegments()){
-        
-            SignLanguageSegment slsegment=new SignLanguageSegment();
-            slsegment.setContent(seg.getContent());
-            slsegment.setStart(seg.getStart());
-            slsegment.setEnd(seg.getEnd());
-            slsegment.setOrder(seg.getOrder());
-            
-            input.getVideo().getSegments().add(slsegment);
-        
-        }
-        return input;
-    
-    }
-    */
-    
+   
 
   
 }

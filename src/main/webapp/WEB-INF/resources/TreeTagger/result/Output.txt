@@ -1,7 +1,0 @@
-Σε	AsPpSp	σε
-αυτή	PnDmFe03SgAc	αυτός
-τη	AtDfFeSgAc	ο
-σπηλιά	NoCmFeSgAc	σπηλιά
-ζει	VbMnIdPr03SgIpAv	ζώ
-μια	AtIdFeSgAc	ένας
-αρκούδα	NoCmFeSgAc	αρκούδα

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package oeg.easytv.annotator.webservice.model;
+package oeg.easytv.annotator.webservice.comm.input;
 
 import oeg.easytvannotator.model.SignLanguageVideo;
 
@@ -11,9 +11,8 @@ import oeg.easytvannotator.model.SignLanguageVideo;
  *
  * @author Pablo
  */
-public class InputServiceTranslation {
+public class InputAnnotateVideo {
     
-    private String translationLanguage;
     private SignLanguageVideo video;
 
     public SignLanguageVideo getVideo() {
@@ -23,16 +22,6 @@ public class InputServiceTranslation {
     public void setVideo(SignLanguageVideo video) {
         this.video = video;
     }
-
-    public String getTranslationLanguage() {
-        return translationLanguage;
-    }
-
-    public void setTranslationLanguage(String translationLanguage) {
-        this.translationLanguage = translationLanguage;
-    }
-    
-    
     
     
 }
