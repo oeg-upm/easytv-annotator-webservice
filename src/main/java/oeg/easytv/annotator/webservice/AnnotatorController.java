@@ -42,6 +42,8 @@ import oeg.easytv.annotator.webservice.comm.input.InputAnnotateTranslatedVideos;
 import oeg.easytv.annotator.webservice.model.TranslatedVideos;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.upm.oeg.easytv.rdfy.Querier;
+import org.upm.oeg.easytv.rdfy.VideoCollection;
+import org.upm.oeg.easytv.rdfy.VideoTranslation;
 
 
 @Controller
@@ -192,6 +194,7 @@ public class AnnotatorController {
 
         try {
 
+            
             if (Annotator == null) {
                 logger.info("Init Annotator");
                 this.initAnnotator();
@@ -225,8 +228,8 @@ public class AnnotatorController {
             
             
             // CREATE MAPPING QUERY
-            //map.queryTranslation(NLPDir, NLPDir, NLPDir, NLPDir, NLPDir, NLPDir);
-            
+            map.createTranslation(res1.UrlID, res2.UrlID, res1.Nls, res2.Nls, res1.Sls, res2.Sls);
+            //createTranslation(String UrlID1, String UrlID2, String Nls1, String Nls2, String Sls1, String Sls2);
                     
             return "Done";
             
@@ -244,7 +247,7 @@ public class AnnotatorController {
     
     
     
-    
+    /*
     
     @RequestMapping(
             value = "/annotateTranslatedVideo",
@@ -252,7 +255,7 @@ public class AnnotatorController {
             produces= "application/json;charset=UTF-8",
             method = RequestMethod.POST)
     @ResponseBody
-    public String annotateTranslatedVideo(@RequestBody TranslatedVideos videos) throws Exception {
+    public String annotateTranslatedVideo(@RequestBody TranslatedVideos videos)  {
  
         //LOG
         createLogFile(videos.getVideos().get(0).getNls()+".json", this.RdfyDir+"logs/jsonvideo" , videos.toString());
@@ -278,6 +281,7 @@ public class AnnotatorController {
 
        
     }
+        */
     
     
     
@@ -285,14 +289,22 @@ public class AnnotatorController {
             value = "/getAllVideos",   
             method = RequestMethod.GET)
     @ResponseBody
-    public String getAllFromSparql() throws Exception {
+    public VideoCollection getAllFromSparql()  {
  
-          System.out.println("enttroororrororo");
-            Querier querier=new Querier(this.RdfyDir); //.getRealPath("/")
-          System.out.println("consulto");
-        
-        return querier.sendQueryAll();
-       
+        try {
+            this.initProperties();
+            System.out.println("enttroororrororo");
+            Querier querier = new Querier(this.RdfyDir); //.getRealPath("/")
+            VideoCollection v = querier.sendQueryAll();
+            System.out.println("consulVidto");
+            return v;
+        } catch (Exception e) {
+
+            System.out.println("Failed in query");
+            e.printStackTrace();
+            return new VideoCollection();
+        }
+
     }
     
     
@@ -300,14 +312,27 @@ public class AnnotatorController {
             value = "/getTranslation",
             method = RequestMethod.GET)
     @ResponseBody
-    public String getTranslation(@RequestParam String videoId) throws Exception {
+    public VideoTranslation getTranslation(@RequestParam String videoURI,@RequestParam String targetLang)  {
         //@RequestMapping(value = "/personId")              
         //String getId(@RequestParam String personId
        //localhost:8090/home/personId?personId=5
+        this.initProperties();
+       try {
+       String s = videoURI +"  "+targetLang+"";
+       System.out.println(s);
        
+       Querier querier=new Querier(this.RdfyDir); //.getRealPath("/")
        
+       VideoTranslation v = querier.sendQueryGetVideoTranslation(videoURI, targetLang);
+       return v;
        
-        return videoId;
+       } catch (Exception e){
+       
+          System.out.println("Failed in query");
+          e.printStackTrace();
+          return new VideoTranslation("","","","");
+       }
+       
        
     }
     
@@ -319,7 +344,7 @@ public class AnnotatorController {
             method = RequestMethod.POST)
     @ResponseBody
     public String verifyTranslations(@RequestBody TranslatedVideos videos) throws Exception {
- 
+         this.initProperties();
        
         return "UNDER DEVELOPMENT";
        
