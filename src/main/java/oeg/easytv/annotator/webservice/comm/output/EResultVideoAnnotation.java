@@ -43,12 +43,14 @@ public class EResultVideoAnnotation {
         UrlID = UrlID.replace("/", "-");
         Segments=new ArrayList();
         
-        int counter=0;
+        int counter=1;
         for (SignLanguageSegment seg : video.getSegments()) {
 
            String next;
            next= String.valueOf(counter+1);
-           if(counter+1 >= video.getSegments().size()){
+           
+           
+           if(counter+1 > video.getSegments().size()){
                next=null;
            }
             
