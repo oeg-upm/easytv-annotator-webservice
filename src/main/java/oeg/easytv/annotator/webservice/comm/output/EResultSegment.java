@@ -5,6 +5,7 @@
  */
 package oeg.easytv.annotator.webservice.comm.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.uniroma1.lcl.babelnet.BabelSense;
 
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ public class EResultSegment {
     public String UrlID;
     public String Nls;
     public String Sls;
+    
+    @JsonIgnore
+    private int maxSyns=3;
 
     public EResultSegment(SignLanguageSegment seg, String NextOrder, String Url, String Nls, String Sls){
     
@@ -57,7 +61,7 @@ public class EResultSegment {
         for (BabelNetSynset syn : seg.Synsets) {
             BabelSense sense = syn.MainSense;
 
-            if (counter==3){break;}
+            if (counter==maxSyns){break;}
             //  "http://babelnet.org/rdf/maestro_ES/s00046958n"
             String id = syn.ID.replace("bn:", "");
 

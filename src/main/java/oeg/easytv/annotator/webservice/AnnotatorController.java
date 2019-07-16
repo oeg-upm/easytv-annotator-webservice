@@ -11,8 +11,6 @@ package oeg.easytv.annotator.webservice;
  */
 
 
-import java.util.ArrayList;
-import javax.servlet.ServletContext;
 import oeg.easytv.annotator.webservice.comm.output.EResultVideoAnnotation;
 import oeg.easytv.annotator.webservice.comm.input.InputAnnotateVideo;
 import oeg.easytvannotator.annotation.SignLanguageVideoAnnotator;
@@ -39,6 +37,7 @@ import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.Properties;
 import oeg.easytv.annotator.webservice.comm.input.InputAnnotateTranslatedVideos;
+import oeg.easytv.annotator.webservice.comm.input.InputUserTranslation;
 import oeg.easytv.annotator.webservice.model.TranslatedVideos;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.upm.oeg.easytv.rdfy.Querier;
@@ -50,26 +49,23 @@ import org.upm.oeg.easytv.rdfy.VideoTranslation;
 public class AnnotatorController {
 
     //@Autowired
-    private ServletContext context2;
+    //private ServletContext context2;
     
-    
-    //private String context="C:\\Users\\Pablo\\Desktop\\easyResources"; 
-    
-    private SignLanguageVideoAnnotator Annotator=null;
-
-    private static Logger logger = Logger.getLogger(AnnotatorController.class);
-    
+ 
     
     private String BabelNetDir;
     private String NLPDir;
     private String RdfyDir;
 
+    private SignLanguageVideoAnnotator Annotator=null;
+
+    private static Logger logger = Logger.getLogger(AnnotatorController.class);
+    
+    
+    
     public void initAnnotator(){
     
-         //this.Annotator = new SignLanguageVideoAnnotator(context.getRealPath("/")+"/WEB-INF/",context.getRealPath("/"),true); 
-         
-        this.initProperties();
-         
+        this.initProperties();     
         this.Annotator = new SignLanguageVideoAnnotator(NLPDir,BabelNetDir,true); 
     
     }
@@ -78,7 +74,7 @@ public class AnnotatorController {
     public void initProperties(){
     
         
-          try {
+        try {
 
             
             InputStream input = this.getClass().getClassLoader().getResourceAsStream("configuration.properties");
@@ -148,16 +144,9 @@ public class AnnotatorController {
             //LOG : recived
             createLogFile(InputJson.getVideo().getNls()+".json", this.RdfyDir+"logs/jsonvideo" , gson.toJson(InputJson));
         
-            
-            
-            
             Annotator.annotateSignLanguageVideo(InputJson.getVideo());
             EResultVideoAnnotation res = new EResultVideoAnnotation(InputJson.getVideo());
             
-            
-            
-            
-
             
             /// MAP TO ONTOLOGY
             Mapper map=new Mapper(this.RdfyDir);
@@ -205,8 +194,6 @@ public class AnnotatorController {
             //LOG : recived
             createLogFile(InputJson.getVideo1().getNls()+".json", this.RdfyDir+"logs/jsonvideo" , gson.toJson(InputJson));
         
-            
-            
             // video1
             Annotator.annotateSignLanguageVideo(InputJson.getVideo1());
             EResultVideoAnnotation res1 = new EResultVideoAnnotation(InputJson.getVideo1());
@@ -214,8 +201,6 @@ public class AnnotatorController {
             // video2
             Annotator.annotateSignLanguageVideo(InputJson.getVideo2());
             EResultVideoAnnotation res2 = new EResultVideoAnnotation(InputJson.getVideo2());
-            
-
             
             /// MAP TO ONTOLOGY
             Mapper map=new Mapper(this.RdfyDir);
@@ -245,68 +230,10 @@ public class AnnotatorController {
     }
     
     
+   
     
     
-    /*
-    
-    @RequestMapping(
-            value = "/annotateTranslatedVideo",
-            consumes = "application/json;charset=UTF-8",
-            produces= "application/json;charset=UTF-8",
-            method = RequestMethod.POST)
-    @ResponseBody
-    public String annotateTranslatedVideo(@RequestBody TranslatedVideos videos)  {
- 
-        //LOG
-        createLogFile(videos.getVideos().get(0).getNls()+".json", this.RdfyDir+"logs/jsonvideo" , videos.toString());
-        
-        try {
-
-            if (Annotator == null) {
-                logger.info("Init Annotator");
-                this.initAnnotator();
-               
-            }
-            System.out.println(videos.getVideos().get(0).getNls());
-           
-            
-            return "uploaded";
-            
-        } catch (Exception e) {
-            logger.error("Error in REST service",e);
-            logger.error(e.getCause().toString());
-            e.printStackTrace();
-            return "failed";
-        }
-
-       
-    }
-        */
-    
-    
-    
-    @RequestMapping(
-            value = "/getAllVideos",   
-            method = RequestMethod.GET)
-    @ResponseBody
-    public VideoCollection getAllFromSparql()  {
- 
-        try {
-            this.initProperties();
-            System.out.println("enttroororrororo");
-            Querier querier = new Querier(this.RdfyDir); //.getRealPath("/")
-            VideoCollection v = querier.sendQueryAll();
-            System.out.println("consulVidto");
-            return v;
-        } catch (Exception e) {
-
-            System.out.println("Failed in query");
-            e.printStackTrace();
-            return new VideoCollection();
-        }
-
-    }
-    
+   
     
     @RequestMapping(
             value = "/getTranslation",
@@ -343,12 +270,59 @@ public class AnnotatorController {
             produces= "application/json;charset=UTF-8",
             method = RequestMethod.POST)
     @ResponseBody
-    public String verifyTranslations(@RequestBody TranslatedVideos videos) throws Exception {
+    public String verifyTranslations(@RequestBody InputUserTranslation translation) throws Exception {
          this.initProperties();
        
-        return "UNDER DEVELOPMENT";
+          try {
+
+            
+          
+            /// MAP TO ONTOLOGY
+            Mapper map=new Mapper(this.RdfyDir);
+           
+            
+            
+            // CREATE MAPPING QUERY
+            map.createTranslationByUser(translation.video1.url, translation.video2.url, translation.video1.nls, translation.video2.nls, translation.video1.sls, translation.video2.sls,translation.confidence);
+            //createTranslation(String UrlID1, String UrlID2, String Nls1, String Nls2, String Sls1, String Sls2);
+                    
+            return "Done";
+            
+        } catch (Exception e) {
+            logger.error("Error in REST service",e);
+            logger.error(e.getCause().toString());
+            e.printStackTrace();
+            
+            return "Failed";
+        }
        
     }
+    
+    
+    /**     OTHERS    **/
+     
+    @RequestMapping(
+            value = "/getAllVideos",   
+            method = RequestMethod.GET)
+    @ResponseBody
+    public VideoCollection getAllFromSparql()  {
+ 
+        try {
+            this.initProperties();
+            System.out.println("enttroororrororo");
+            Querier querier = new Querier(this.RdfyDir); //.getRealPath("/")
+            VideoCollection v = querier.sendQueryAll();
+            System.out.println("consulVidto");
+            return v;
+        } catch (Exception e) {
+
+            System.out.println("Failed in query");
+            e.printStackTrace();
+            return new VideoCollection();
+        }
+
+    }
+    
     
     
     
@@ -383,6 +357,45 @@ public class AnnotatorController {
        
     }
     
+    
+      
+    @RequestMapping(
+            value = "/parseVideo",
+            consumes = "application/json;charset=UTF-8",
+            method = RequestMethod.POST)
+    @ResponseBody
+    public EResultVideoAnnotation parsevideo(@RequestBody InputAnnotateVideo InputJson) {
+
+        try {
+
+            if (Annotator == null) {
+                logger.info("Init Annotator");
+                this.initAnnotator();
+            }
+
+            Gson gson = new Gson(); 
+            
+            //LOG : recived
+            createLogFile(InputJson.getVideo().getNls()+".json", this.RdfyDir+"logs/jsonvideo" , gson.toJson(InputJson));
+        
+            Annotator.annotateSignLanguageVideo(InputJson.getVideo());
+            EResultVideoAnnotation res = new EResultVideoAnnotation(InputJson.getVideo());
+            
+           
+            
+            
+            return res;
+            
+        } catch (Exception e) {
+            logger.error("Error in REST service",e);
+            logger.error(e.getCause().toString());
+            e.printStackTrace();
+            
+            return new EResultVideoAnnotation();
+        }
+
+       
+    }
     
     
     
@@ -431,13 +444,9 @@ public class AnnotatorController {
     }
     
     
-   
-    
-  
     
     
-    
-     public static File createLogFile(String FileName, String Dir, String Text) {
+    public static File createLogFile(String FileName, String Dir, String Text) {
 
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
