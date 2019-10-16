@@ -41,6 +41,7 @@ public class EResultVideoAnnotation {
         String newUrl = this.Url.replace("http://", "");
         UrlID = newUrl.replace(".mp4", "");
         UrlID = UrlID.replace("/", "-");
+        UrlID = UrlID.replace(":", "-");
         Segments=new ArrayList();
         
         int counter=1;
