@@ -58,7 +58,12 @@ public class AnnotatorController {
     
     @PostConstruct
     public void initIt() {
-	  System.out.println("Init method after properties are set : " );
+	  logger.info("Init method : " );
+          try{
+          checkAnnotatorStatus();
+          }catch(Exception e){
+          logger.error("Unable to start service at deploy time. "+e);
+          }
     }
     
     public void initAnnotator() throws Exception {
