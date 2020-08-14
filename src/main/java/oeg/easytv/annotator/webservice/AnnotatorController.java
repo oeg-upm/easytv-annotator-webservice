@@ -9,12 +9,14 @@ package oeg.easytv.annotator.webservice;
  *
  * @author Pablo
  */
+
+import oeg.easytvannotator.annotation.SignLanguageVideoAnnotator;
 import oeg.easytv.annotator.webservice.comm.output.EResultVideoAnnotation;
 import oeg.easytv.annotator.webservice.comm.input.InputAnnotateVideo;
-import oeg.easytvannotator.annotation.SignLanguageVideoAnnotator;
+import oeg.easytv.annotator.webservice.comm.input.InputAnnotateTranslatedVideos;
+import oeg.easytv.annotator.webservice.comm.input.InputUserTranslation;
 import oeg.easytvannotator.babelnet.BabelNetInterface;
 import oeg.easytvannotator.model.ESentence;
-import oeg.easytvannotator.model.EasyTVInterface;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,8 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import javax.annotation.PostConstruct;
-import oeg.easytv.annotator.webservice.comm.input.InputAnnotateTranslatedVideos;
-import oeg.easytv.annotator.webservice.comm.input.InputUserTranslation;
+
 import org.springframework.web.bind.annotation.RequestParam;
 import org.upm.oeg.easytv.rdfy.Querier;
 import org.upm.oeg.easytv.rdfy.VideoCollection;
@@ -427,15 +428,11 @@ public class AnnotatorController {
 
         try {
             initProperties();
-            EasyTVInterface annotator = null;
-            if (annotator == null) {
-                logger.info("Init Annotator");
-                annotator = new EasyTVInterface(this.NLPDir, this.BabelNetDir, true);
-
-            }
-            ESentence ese = annotator.procesSentence("EL", "το σπίτι είναι κόκκινο");
-
+            checkAnnotatorStatus();
+           
+            ESentence ese =  this.Annotator.procesTestSentence("EL", "το σπίτι είναι κόκκινο");
             return ese.print();
+            
         } catch (Exception e) {
 
             logger.error("Test Failed:" + e);

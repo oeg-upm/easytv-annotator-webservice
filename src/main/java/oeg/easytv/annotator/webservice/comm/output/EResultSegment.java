@@ -7,7 +7,6 @@ package oeg.easytv.annotator.webservice.comm.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.uniroma1.lcl.babelnet.BabelSense;
-
 import java.util.ArrayList;
 import java.util.List;
 import oeg.easytvannotator.babelnet.BabelNetSynset;
