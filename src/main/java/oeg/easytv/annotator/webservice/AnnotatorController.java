@@ -175,8 +175,6 @@ public class AnnotatorController {
     @RequestMapping(
             value = "/annotateTranslatedVideos",
             consumes = "application/json;charset=UTF-8",
-            //produces= "application/json;charset=UTF-8",
-            //produces= "text/plain;charset=UTF-8",
             method = RequestMethod.POST)
     @ResponseBody
     public String annotateTranslatedVideos(@RequestBody InputAnnotateTranslatedVideos InputJson) {
@@ -227,9 +225,6 @@ public class AnnotatorController {
             method = RequestMethod.GET)
     @ResponseBody
     public VideoTranslation getTranslation(@RequestParam String videoURI, @RequestParam String targetLang) {
-        //@RequestMapping(value = "/personId")              
-        //String getId(@RequestParam String personId
-        //localhost:8090/home/personId?personId=5
 
         try {
 
