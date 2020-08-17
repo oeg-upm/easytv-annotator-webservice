@@ -416,13 +416,19 @@ public class AnnotatorController {
 
     }
 
-    @RequestMapping("/status")
+  
+    @RequestMapping(
+            value = "/status",
+            method = RequestMethod.GET)
     @ResponseBody
     public String status() {
         return "UP";
     }
 
-    @RequestMapping("/testGreek")
+   
+    @RequestMapping(
+            value = "/testGreek",
+            method = RequestMethod.GET)
     @ResponseBody
     public String testGreek() {
 
@@ -440,7 +446,10 @@ public class AnnotatorController {
         }
     }
 
-    @RequestMapping("/testBabelNetConnection")
+    
+    @RequestMapping(
+            value = "/testBabelNetConnection",
+            method = RequestMethod.GET)
     @ResponseBody
     public String testSpanish() {
         try {
@@ -456,7 +465,10 @@ public class AnnotatorController {
 
     }
 
-    @RequestMapping("/restartAnnotator")
+    
+    @RequestMapping(
+            value = "/restartAnnotator",
+            method = RequestMethod.GET)
     @ResponseBody
     public String restartAnnotator() {
 
