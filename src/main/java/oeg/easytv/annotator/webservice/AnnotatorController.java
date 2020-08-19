@@ -353,6 +353,87 @@ public class AnnotatorController {
 
     }
 
+    @RequestMapping(value = {"/getVideosOfConcept"}, method = {RequestMethod.GET})
+  @ResponseBody
+  public List<VideoTranslation> getVideosOfConcept(@RequestParam String concept, @RequestParam String lang) {
+    try {
+      initProperties();
+      logger.info(concept + "  " + lang + "");
+      Querier querier = new Querier(this.RdfyDir);
+      List<VideoTranslation> list = querier.getVideosFromKeyConcept(concept, lang);
+      return list;
+    } catch (Exception e) {
+      logger.error("Failed:" + e);
+      return new ArrayList<>();
+    } 
+  }
+  
+  
+  @RequestMapping(value = {"/deleteGraph"}, method = {RequestMethod.DELETE})
+  @ResponseBody
+  public String deleteGraph(@RequestParam String graph) throws Exception {
+    initProperties();
+    try {
+      if (graph.equals(""))
+        return "No graph selected"; 
+      Querier querier = new Querier(this.RdfyDir);
+      boolean response = querier.deleteGraph(graph);
+      if (!response)
+        return "Failed"; 
+      return "Done";
+    } catch (Exception e) {
+      logger.error("Error in REST service", e);
+      return e.getCause().toString();
+    } 
+  }
+  
+  @RequestMapping(value = {"/deleteGraphFromVideoURL"}, method = {RequestMethod.DELETE})
+  @ResponseBody
+  public String deleteGraphFromVideoURL(@RequestParam String VideoURL) throws Exception {
+    initProperties();
+    try {
+      if (VideoURL.equals(""))
+        return "No video selected"; 
+      Querier querier = new Querier(this.RdfyDir);
+      boolean response = querier.deleteGraphFromVideoURL(VideoURL);
+      if (!response)
+        return "Failed"; 
+      return "Done";
+    } catch (Exception e) {
+      logger.error("Error in REST service", e);
+      return e.getCause().toString();
+    } 
+  }
+  
+    
+  @RequestMapping(value = {"/getAllGraphs"}, method = {RequestMethod.GET})
+  @ResponseBody
+  public List<String> getAllGraph() {
+    try {
+      initProperties();
+      Querier querier = new Querier(this.RdfyDir);
+      List<String> list = querier.getAllGraphs();
+      return list;
+    } catch (Exception e) {
+      logger.error("Failed:" + e);
+      return new ArrayList<>();
+    } 
+  }
+  
+  @RequestMapping(value = {"/getGraphOfVideo"}, method = {RequestMethod.GET})
+  @ResponseBody
+  public String getGraphOfVideo(@RequestParam String VideoURL) {
+    try {
+      initProperties();
+      Querier querier = new Querier(this.RdfyDir);
+      String res = querier.getGraphFromVideoURL(VideoURL);
+      return res;
+    } catch (Exception e) {
+      logger.error("Failed:" + e);
+      return "";
+    } 
+  }
+    
     @RequestMapping(
             value = "/uploadGraph",
             consumes = "application/json;charset=UTF-8",
@@ -441,6 +522,8 @@ public class AnnotatorController {
         }
     }
 
+    
+    
     
     @RequestMapping(
             value = "/testBabelNetConnection",
